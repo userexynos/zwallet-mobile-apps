@@ -9,10 +9,10 @@ import {
   ScrollView,
   ToastAndroid,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
 import {colors, fonts} from '../../helpers/constants';
 import CardHistory from '../../components/Cards/CardHistory';
 import Toolbar from '../../components/Toolbars/Toolbar';
+import {useDispatch, useSelector} from 'react-redux';
 import Icons from 'react-native-vector-icons/Feather';
 import {currency} from '../../helpers/number';
 import {Histories} from '../../redux/actions/users';
@@ -66,7 +66,7 @@ const Transactions = ({navigation}) => {
             textAlign: 'center',
             marginVertical: 20,
           }}>
-          {error}
+          You not have any transaction
         </Text>
       ) : (
         histories

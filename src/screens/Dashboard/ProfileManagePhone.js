@@ -70,6 +70,7 @@ const ProfileManagePhones = ({navigation}) => {
 
               <CardCustom
                 style={styles.profilecard}
+                rippleColor={colors.transparent}
                 title="Primary"
                 subtitle={
                   userdata?.phone ? `+62 ${userdata.phone}` : 'Add Phone Number'

@@ -36,7 +36,8 @@ const Main = ({navigation}) => {
     const _callbackHandler = (res, err) => {
       if (!err) {
         if (!res.data.data.pin) {
-          return navigation.navigate('Auth', {
+          setLoading(false);
+          return navigation.replace('Auth', {
             screen: 'RegisterPin',
             params: {token, navigate: 'Dashboard'},
           });
@@ -90,7 +91,7 @@ const Main = ({navigation}) => {
             textAlign: 'center',
             marginVertical: 20,
           }}>
-          {error}
+          You not have any transaction
         </Text>
       ) : (
         histories

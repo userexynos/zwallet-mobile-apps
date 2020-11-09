@@ -12,7 +12,7 @@ const CardReceiver = React.memo((props) => {
       onPress={onPress}
       style={[styles.receiverCard, style]}>
       <Image
-        source={src ? src : require('../../assets/images/default.png')}
+        source={src ? {uri: src} : require('../../assets/images/default.png')}
         style={styles.receiverPhoto}
       />
       <View style={styles.receiverProfile}>
@@ -64,5 +64,6 @@ const styles = StyleSheet.create({
   receiverPhoto: {
     height: 56,
     width: 56,
+    borderRadius: 10,
   },
 });

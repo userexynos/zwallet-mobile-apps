@@ -54,7 +54,7 @@ const SearchReceiver = ({navigation}) => {
   const _loadFindUser = () => {
     setLoading(true);
     setOffset(offset + 1);
-    dispatch(FindUser({token, offset, reset: false}, _callbackFindUser));
+    dispatch(FindUser({token, name, offset, reset: false}, _callbackFindUser));
   };
 
   const _findUser = () => {
@@ -85,13 +85,14 @@ const SearchReceiver = ({navigation}) => {
             textAlign: 'center',
             marginVertical: 20,
           }}>
-          {error}
+          User data isn't available
         </Text>
       ) : (
         findUser.map((item, index) => (
           <CardReceiver
             key={index}
             style={{marginVertical: 5}}
+            src={item.photo}
             name={item.name}
             phone={item?.phone ? `+62 ${item?.phone}` : "The phone isn't set"}
             onPress={() => navigation.navigate('TransferAmount', item)}

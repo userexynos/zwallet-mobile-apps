@@ -10,13 +10,13 @@ import {
   Text,
   ToastAndroid,
 } from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
 import {colors, fonts} from '../../helpers/constants';
 import CardHistory from '../../components/Cards/CardHistory';
 import Toolbar from '../../components/Toolbars/Toolbar';
 import ButtonIcon from '../../components/Buttons/ButtonIcon';
 import Button from '../../components/Buttons/Button';
-import {Histories} from '../../redux/actions/users';
+import {useDispatch, useSelector} from 'react-redux';
+import {FilterHistory, Histories} from '../../redux/actions/users';
 import Loading from '../../components/Modals/Loading';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
 
@@ -24,6 +24,7 @@ const {height, width} = Dimensions.get('screen');
 
 const History = ({navigation}) => {
   const [error, setError] = React.useState('');
+  const [filter, setFilter] = React.useState('');
   const [loading, setLoading] = React.useState(false);
   const [more, setMore] = React.useState(true);
   const [offset, setOffset] = React.useState(2);
@@ -37,6 +38,22 @@ const History = ({navigation}) => {
     dispatch(Histories({token, offset: 1, reset: true}, _callbackHistory));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  React.useEffect(() => {
+    setOffset(2);
+    setMore(true);
+    setLoading(true);
+
+    if (!filter) {
+      return dispatch(
+        Histories({token, offset: 1, reset: true}, _callbackHistory),
+      );
+    }
+
+    return dispatch(
+      FilterHistory({token, filter, offset: 1, reset: true}, _callbackHistory),
+    );
+  }, [filter, dispatch, token]);
 
   const _callbackHistory = (res, err) => {
     setLoading(false);
@@ -55,6 +72,14 @@ const History = ({navigation}) => {
     setLoading(true);
     setOffset(offset + 1);
     dispatch(Histories({token, offset, reset: false}, _callbackHistory));
+  };
+
+  const _loadHistoryFilter = () => {
+    setLoading(true);
+    setOffset(offset + 1);
+    dispatch(
+      FilterHistory({token, filter, offset, reset: false}, _callbackHistory),
+    );
   };
 
   const RenderHistory = () => (
@@ -77,7 +102,7 @@ const History = ({navigation}) => {
             textAlign: 'center',
             marginVertical: 20,
           }}>
-          {error}
+          You not have any transaction
         </Text>
       ) : (
         histories.map((item, index) => (
@@ -120,7 +145,9 @@ const History = ({navigation}) => {
 
               {more ? (
                 <TouchableWithoutFeedback
-                  onPress={() => _loadHistory()}
+                  onPress={() =>
+                    filter ? _loadHistoryFilter() : _loadHistory()
+                  }
                   style={{marginVertical: 10, alignItems: 'center'}}>
                   <Text style={{color: colors.primary, fontFamily: fonts.bold}}>
                     Load More
@@ -138,7 +165,14 @@ const History = ({navigation}) => {
                 rippleColor={colors.rippleDark}
                 iconSize={28}
                 iconColor={colors.success}
-                style={styles.buttonAction}
+                style={[
+                  styles.buttonAction,
+                  {
+                    backgroundColor:
+                      filter === 'income' ? colors.primary : colors.white,
+                  },
+                ]}
+                onPress={() => setFilter(filter === 'income' ? '' : 'income')}
               />
 
               <ButtonIcon
@@ -147,7 +181,14 @@ const History = ({navigation}) => {
                 rippleColor={colors.rippleDark}
                 iconSize={28}
                 iconColor={colors.error}
-                style={styles.buttonAction}
+                style={[
+                  styles.buttonAction,
+                  {
+                    backgroundColor:
+                      filter === 'expense' ? colors.primary : colors.white,
+                  },
+                ]}
+                onPress={() => setFilter(filter === 'expense' ? '' : 'expense')}
               />
 
               <Button

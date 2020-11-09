@@ -64,7 +64,7 @@ const Topup = ({navigation}) => {
             textAlign: 'center',
             marginVertical: 20,
           }}>
-          {error}
+          Topup data isn't available
         </Text>
       ) : (
         topupGuide.map((item, index) => (

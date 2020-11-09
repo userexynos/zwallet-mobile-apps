@@ -113,6 +113,7 @@ const TransferStatus = ({navigation, route}) => {
 
               <Text style={styles.transferTitle}>Transfer to</Text>
               <CardReceiver
+                src={history.photo_receiver}
                 style={{borderRadius: 10, marginVertical: 6}}
                 rippleColor={colors.transparent}
                 name={history.name_receiver}

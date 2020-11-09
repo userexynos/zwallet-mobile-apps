@@ -22,7 +22,6 @@ const {width} = Dimensions.get('window');
 
 const Login = ({navigation, route}) => {
   const dispatch = useDispatch();
-
   const [pin, setPin] = React.useState('');
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
@@ -116,7 +115,7 @@ const Login = ({navigation, route}) => {
 
                 <Button
                   disabled={!pin}
-                  style={{marginTop: isKey ? width / 4 : width / 1.8}}
+                  style={{marginTop: isKey ? width / 5 : width / 1.8}}
                   rippleColor={colors.dark}
                   textColor={colors.white}
                   backgroundColor={colors.primary}

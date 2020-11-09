@@ -103,7 +103,7 @@ const ChangePassword = (data, callback) => () => {
 const ChangePhoto = (data, callback) => () => {
   const {photo, token} = data;
   axios
-    .post(`/users/photo`, photo, {
+    .post('/users/photo', photo, {
       headers: {
         'content-type': 'multipart/form-data',
         Authorization: `Bearer ${token}`,
@@ -159,6 +159,25 @@ const HistoryByID = (data, callback) => (dispatch) => {
     .catch((error) => callback(error.response, false));
 };
 
+const FilterHistory = (data, callback) => (dispatch) => {
+  const {token, filter, offset, reset} = data;
+  axios
+    .get(`/users/histories?offset=${offset}&limit=5&filter=${filter}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+    .then((res) => {
+      if (reset) {
+        dispatch(patcher(SETHISTORYDATA, res.data.data));
+      } else {
+        dispatch(patcher(ADDHISTORYDATA, res.data.data));
+      }
+      callback(res, false);
+    })
+    .catch((error) => callback(error.response, false));
+};
+
 export {
   UserLoad,
   Histories,
@@ -170,4 +189,5 @@ export {
   FindUser,
   BalanceTransfer,
   HistoryByID,
+  FilterHistory,
 };

@@ -48,6 +48,7 @@ const TransferConfirm = ({navigation, route}) => {
 
             <View style={styles.transferContainer}>
               <CardReceiver
+                src={user.photo}
                 style={{borderRadius: 10, marginVertical: 6}}
                 rippleColor={colors.transparent}
                 name={user.name}

@@ -75,7 +75,7 @@ const History = ({navigation}) => {
             textAlign: 'center',
             marginVertical: 20,
           }}>
-          {error}
+          You not have any transaction
         </Text>
       ) : (
         histories.map((item, index) => (

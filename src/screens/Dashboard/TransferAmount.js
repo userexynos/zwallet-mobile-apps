@@ -71,6 +71,7 @@ const TransferAmount = ({navigation, route}) => {
 
             <View style={{zIndex: 0}}>
               <CardReceiver
+                src={route.params.photo}
                 style={styles.cardReceiver}
                 rippleColor={colors.transparent}
                 name={route.params.name}
