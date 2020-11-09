@@ -1,3 +1,5 @@
+import axiosCreate from 'axios';
+
 const colors = {
   primary: '#6379F4',
   dark: '#3A3D42',
@@ -8,6 +10,8 @@ const colors = {
   vanilla: '#FAFCFF',
   transparent: 'rgba(0,0,0,0)',
   grey: '#A9A9A9',
+  grey2: '#E5E8ED',
+  rippleDark: 'rgba(0,0,0,0.1)',
 };
 
 const fonts = {
@@ -17,4 +21,9 @@ const fonts = {
   bold: 'NunitoSans-Bold',
 };
 
-export {colors, fonts};
+const axios = axiosCreate.create({
+  // baseURL: 'http://54.86.186.28:4444/api/v1',
+  baseURL: 'http://192.168.100.27:4444/api/v1',
+});
+
+export {colors, fonts, axios};

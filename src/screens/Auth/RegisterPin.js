@@ -11,14 +11,21 @@ import {
   Keyboard,
   Animated,
 } from 'react-native';
+import {useDispatch} from 'react-redux';
 import Button from '../../components/Buttons/Button';
 import InputPinBorder from '../../components/Inputs/InputPinBorder';
+import Loading from '../../components/Modals/Loading';
 import {colors, fonts} from '../../helpers/constants';
+import {AuthCreatePin} from '../../redux/actions/auth';
 
 const {width} = Dimensions.get('window');
 
-const Login = ({navigation}) => {
+const Login = ({navigation, route}) => {
+  const dispatch = useDispatch();
+
   const [pin, setPin] = React.useState('');
+  const [error, setError] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
   const [isKey, setKey] = React.useState(false);
   const AnimatedContent = React.useState(new Animated.Value(0))[0];
   const AnimatedContentRef = React.useRef(AnimatedContent);
@@ -49,8 +56,30 @@ const Login = ({navigation}) => {
     outputRange: [0, -width / 4.5],
   });
 
+  const _handleCreatePin = () => {
+    setLoading(true);
+    setError('');
+    const data = {pin, token: route.params.token};
+
+    const _handleResponse = (res, err) => {
+      setLoading(false);
+      if (!err) {
+        return navigation.navigate('RegisterSuccess', {
+          navigate: route.params?.navigate,
+        });
+      }
+      if (res) {
+        return setError(res.data.message);
+      }
+      return setError('Connection Error');
+    };
+
+    dispatch(AuthCreatePin(data, _handleResponse));
+  };
+
   return (
     <>
+      <Loading show={loading} />
       <StatusBar
         translucent
         backgroundColor={colors.transparent}
@@ -75,13 +104,24 @@ const Login = ({navigation}) => {
                   onChangeText={(text) => setPin(text)}
                 />
 
+                <Text
+                  style={{
+                    color: colors.error,
+                    textAlign: 'center',
+                    fontSize: 12,
+                    marginTop: 10,
+                  }}>
+                  {error ? error : ''}
+                </Text>
+
                 <Button
+                  disabled={!pin}
                   style={{marginTop: isKey ? width / 4 : width / 1.8}}
                   rippleColor={colors.dark}
                   textColor={colors.white}
                   backgroundColor={colors.primary}
                   text="Confirm"
-                  onPress={() => navigation.replace('RegisterSuccess')}
+                  onPress={_handleCreatePin}
                 />
               </View>
             </Animated.View>

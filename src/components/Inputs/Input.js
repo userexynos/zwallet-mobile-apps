@@ -6,17 +6,32 @@ import {colors, fonts} from '../../helpers/constants';
 
 const {width} = Dimensions.get('window');
 
-const InputBorderedBottom = memo((props) => {
-  const {icon, reff, password, error, style, ...input} = props;
+const Input = memo((props) => {
+  const {
+    icon,
+    reff,
+    password,
+    onBlur,
+    styleInput,
+    style,
+    iconColor,
+    onFocus,
+    ...input
+  } = props;
   const [focus, setFocus] = React.useState(false);
   const [show, setShow] = React.useState(false);
 
-  const active = error
-    ? colors.error
-    : focus || input.value
-    ? colors.primary
-    : colors.grey;
-  const showActive = error ? colors.error : show ? colors.primary : colors.grey;
+  const active = focus || input.value ? colors.primary : iconColor;
+  const showActive = show ? colors.primary : colors.grey;
+  const _handleBlur = () => {
+    setFocus(!focus);
+    onBlur ? onBlur() : null;
+  };
+
+  const _handleFocus = () => {
+    setFocus(!focus);
+    onFocus ? onFocus() : null;
+  };
 
   return (
     <View
@@ -25,17 +40,18 @@ const InputBorderedBottom = memo((props) => {
         ...style,
         borderBottomColor: active,
       }}>
-      <Icons name={icon} color={active} size={width / 14} />
+      {icon ? <Icons name={icon} color={active} size={width / 14} /> : null}
 
       <TextInput
         {...input}
         ref={reff}
-        onFocus={() => setFocus(!focus)}
-        onBlur={() => setFocus(!focus)}
+        onFocus={_handleFocus}
+        onBlur={_handleBlur}
         secureTextEntry={show ? false : input.secureTextEntry}
         style={{
           ...styles.textInput,
           width: input.secureTextEntry ? '75%' : '88%',
+          ...styleInput,
         }}
       />
 
@@ -56,7 +72,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     width: '100%',
     alignItems: 'center',
-    borderBottomWidth: 2,
     overflow: 'hidden',
     fontFamily: fonts.regular,
   },
@@ -67,4 +82,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default InputBorderedBottom;
+export default Input;

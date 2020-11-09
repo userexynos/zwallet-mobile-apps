@@ -11,16 +11,24 @@ import {
   Keyboard,
   Animated,
 } from 'react-native';
+import {useDispatch} from 'react-redux';
 import Button from '../../components/Buttons/Button';
 import InputBorderedBottom from '../../components/Inputs/InputBorderedBottom';
+import Loading from '../../components/Modals/Loading';
 import {colors, fonts} from '../../helpers/constants';
+import {AuthRegister} from '../../redux/actions/auth';
 
 const {width} = Dimensions.get('window');
 
 const Register = ({navigation}) => {
+  const dispatch = useDispatch();
+
   const [name, setName] = React.useState('');
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
+
   const [isKey, setKey] = React.useState(false);
   const AnimatedContent = React.useState(new Animated.Value(0))[0];
   const AnimatedContentRef = React.useRef(AnimatedContent);
@@ -53,8 +61,53 @@ const Register = ({navigation}) => {
     outputRange: [0, -width / 4.5],
   });
 
+  const _handleName = (text) => {
+    if (error) {
+      setError('');
+    }
+
+    setName(text);
+  };
+
+  const _handleEmail = (text) => {
+    if (error) {
+      setError('');
+    }
+
+    setEmail(text);
+  };
+
+  const _handlePassword = (text) => {
+    if (error) {
+      setError('');
+    }
+
+    setPassword(text);
+  };
+
+  const _handleRegister = () => {
+    setLoading(true);
+    setError('');
+    const data = {name, email, password};
+
+    const _handleResponse = (res, err) => {
+      setLoading(false);
+      if (!err) {
+        return navigation.replace('RegisterPin', {token: res.data.data.token});
+      }
+      if (res) {
+        return setError(res.data.message);
+      }
+      return setError('Connection Error');
+    };
+
+    dispatch(AuthRegister(data, _handleResponse));
+  };
+
   return (
     <>
+      <Loading show={loading} />
+
       <StatusBar
         translucent
         backgroundColor={colors.transparent}
@@ -77,43 +130,56 @@ const Register = ({navigation}) => {
               <View style={styles.formContainer}>
                 <InputBorderedBottom
                   returnKeyType="next"
-                  onChangeText={(text) => setName(text)}
+                  onChangeText={_handleName}
                   onSubmitEditing={() => emailRef.current.focus()}
                   style={{marginTop: 20}}
                   placeholder="Enter your name"
                   icon="user"
                   value={name}
+                  error={error}
                 />
 
                 <InputBorderedBottom
                   reff={emailRef}
                   returnKeyType="next"
                   keyboardType="email-address"
-                  onChangeText={(text) => setEmail(text)}
+                  onChangeText={_handleEmail}
                   onSubmitEditing={() => passwordRef.current.focus()}
                   style={{marginTop: 20}}
                   placeholder="Enter your e-mail"
                   icon="mail"
                   value={email}
+                  error={error}
                 />
 
                 <InputBorderedBottom
                   reff={passwordRef}
-                  onChangeText={(text) => setPassword(text)}
+                  onChangeText={_handlePassword}
                   secureTextEntry
                   style={{marginTop: 20}}
                   returnKeyType="done"
                   placeholder="********"
                   icon="lock"
                   value={password}
+                  error={error}
                 />
 
+                <Text
+                  style={{
+                    color: colors.error,
+                    textAlign: 'center',
+                    fontSize: 12,
+                    marginTop: 10,
+                  }}>
+                  {error ? error : ''}
+                </Text>
+
                 <Button
-                  style={{marginTop: isKey ? width / 20 : width / 6}}
+                  style={{marginTop: isKey ? width / 20 : width / 8}}
                   rippleColor={colors.dark}
                   textColor={colors.white}
                   backgroundColor={colors.primary}
-                  onPress={() => navigation.navigate('RegisterPin')}
+                  onPress={_handleRegister}
                   text="Sign Up"
                 />
 

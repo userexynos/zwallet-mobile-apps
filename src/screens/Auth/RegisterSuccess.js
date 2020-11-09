@@ -7,7 +7,6 @@ import {
   SafeAreaView,
   StatusBar,
   Dimensions,
-  ScrollView,
 } from 'react-native';
 import Icons from 'react-native-vector-icons/Feather';
 import Button from '../../components/Buttons/Button';
@@ -15,7 +14,13 @@ import {colors, fonts} from '../../helpers/constants';
 
 const {width} = Dimensions.get('window');
 
-const Login = ({navigation}) => {
+const Login = ({navigation, route}) => {
+  const _handleRoute = () => {
+    if (route.params.navigate) {
+      navigation.navigate(route.params.navigate);
+    }
+    return navigation.navigate('Login');
+  };
   return (
     <>
       <StatusBar
@@ -54,7 +59,7 @@ const Login = ({navigation}) => {
               textColor={colors.white}
               backgroundColor={colors.primary}
               text="Confirm"
-              onPress={() => navigation.pop(3)}
+              onPress={_handleRoute}
             />
           </View>
         </View>

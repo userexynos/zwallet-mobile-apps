@@ -12,31 +12,51 @@ import {
   Animated,
 } from 'react-native';
 import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+import {useDispatch, useSelector} from 'react-redux';
+import {colors, fonts} from '../../helpers/constants';
 import Button from '../../components/Buttons/Button';
 import InputBorderedBottom from '../../components/Inputs/InputBorderedBottom';
-import {colors, fonts} from '../../helpers/constants';
+import Loading from '../../components/Modals/Loading';
+import {AuthLogin} from '../../redux/actions/auth';
 
 const {width} = Dimensions.get('window');
 
 const Login = ({navigation}) => {
+  const dispatch = useDispatch();
+
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
+  const passwordRef = React.useRef();
+
+  const [loading, setLoading] = React.useState(false);
+  const [error, setError] = React.useState('');
   const [isKey, setKey] = React.useState(false);
   const AnimatedContent = React.useState(new Animated.Value(0))[0];
   const AnimatedContentRef = React.useRef(AnimatedContent);
-  const passwordRef = React.useRef();
+  const {token} = useSelector((state) => state.Auth);
 
   React.useEffect(() => {
+    setLoading(true);
     const keyboardShow = Keyboard.addListener('keyboardDidShow', () =>
       setKey(true),
     );
-    const keyboardDismiss = Keyboard.addListener('keyboardDidHide', () =>
-      setKey(false),
-    );
+    const keyboardDismiss = Keyboard.addListener('keyboardDidHide', () => {
+      setKey(false);
+    });
+
+    const timeout = setTimeout(() => {
+      if (token) {
+        navigation.replace('Dashboard');
+        console.log(token);
+      }
+      setLoading(false);
+    }, 1000);
     return () => {
+      clearTimeout(timeout);
       keyboardShow.remove();
       keyboardDismiss.remove();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   React.useEffect(() => {
@@ -52,8 +72,44 @@ const Login = ({navigation}) => {
     outputRange: [0, -width / 4.5],
   });
 
+  const _handleEmail = (text) => {
+    if (error) {
+      setError('');
+    }
+
+    setEmail(text);
+  };
+
+  const _handlePassword = (text) => {
+    if (error) {
+      setError('');
+    }
+
+    setPassword(text);
+  };
+
+  const _handleLogin = () => {
+    setLoading(true);
+    setError('');
+    const data = {email, password};
+
+    const _handleResponse = (res, err) => {
+      setLoading(false);
+      if (!err) {
+        return navigation.replace('Dashboard');
+      }
+
+      if (res) {
+        return setError(res.data.message);
+      }
+      return setError('Connection Error');
+    };
+
+    dispatch(AuthLogin(data, _handleResponse));
+  };
   return (
     <>
+      <Loading show={loading} />
       <StatusBar
         translucent
         backgroundColor={colors.transparent}
@@ -76,23 +132,25 @@ const Login = ({navigation}) => {
               <View style={styles.formContainer}>
                 <InputBorderedBottom
                   returnKeyType="next"
-                  onChangeText={(text) => setEmail(text)}
+                  onChangeText={_handleEmail}
                   onSubmitEditing={() => passwordRef.current.focus()}
                   style={{marginTop: 20}}
                   keyboardType="email-address"
                   placeholder="Enter your e-mail"
                   icon="mail"
                   value={email}
+                  error={error}
                 />
                 <InputBorderedBottom
                   reff={passwordRef}
-                  onChangeText={(text) => setPassword(text)}
+                  onChangeText={_handlePassword}
                   secureTextEntry
                   style={{marginTop: 20}}
                   returnKeyType="done"
                   placeholder="********"
                   icon="lock"
                   value={password}
+                  error={error}
                 />
                 <TouchableWithoutFeedback
                   onPress={() => navigation.navigate('ResetPassword')}
@@ -100,12 +158,23 @@ const Login = ({navigation}) => {
                   <Text style={{color: colors.grey}}>Forgot Password?</Text>
                 </TouchableWithoutFeedback>
 
+                <Text
+                  style={{
+                    color: colors.error,
+                    textAlign: 'center',
+                    fontSize: 12,
+                    marginTop: 10,
+                  }}>
+                  {error ? error : ''}
+                </Text>
+
                 <Button
-                  style={{marginTop: isKey ? width / 30 : width / 5}}
+                  style={{marginTop: isKey ? width / 30 : width / 7}}
                   rippleColor={colors.dark}
                   textColor={colors.white}
                   backgroundColor={colors.primary}
                   text="Login"
+                  onPress={_handleLogin}
                 />
 
                 <Text

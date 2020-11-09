@@ -1,10 +1,10 @@
-import React from 'react';
+import React, {memo} from 'react';
 import {View, TextInput, StyleSheet, Dimensions} from 'react-native';
 import {colors, fonts} from '../../helpers/constants';
 
 const {width} = Dimensions.get('window');
 
-const InputPinBorder = (props) => {
+const InputPinBorder = memo((props) => {
   const {length, onChangeText} = props;
   const inputLength = React.useState(Array(length).fill(''))[0];
   const createRef = [];
@@ -50,7 +50,7 @@ const InputPinBorder = (props) => {
       })}
     </View>
   );
-};
+});
 
 const styles = StyleSheet.create({
   inputContainer: {
@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingHorizontal: width / 50,
     paddingVertical: 4,
+    backgroundColor: colors.white,
   },
   inputText: {
     textAlign: 'center',
