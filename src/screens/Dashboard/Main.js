@@ -18,6 +18,7 @@ import Loading from '../../components/Modals/Loading';
 import {Histories, UserLoad} from '../../redux/actions/users';
 import {currency} from '../../helpers/number';
 import {AuthLogout} from '../../redux/actions/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const Main = ({navigation}) => {
   const [loading, setLoading] = React.useState(false);
@@ -29,20 +30,28 @@ const Main = ({navigation}) => {
   React.useEffect(() => {
     setLoading(true);
     _loadUser();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const _loadUser = () => {
     const _callbackHandler = (res, err) => {
       if (!err) {
-        if (!res.data.data.pin) {
-          setLoading(false);
-          return navigation.replace('Auth', {
-            screen: 'RegisterPin',
-            params: {token, navigate: 'Dashboard'},
+        return messaging()
+          .getToken()
+          .then((deviceToken) => {
+            if (deviceToken !== res.data.data.device) {
+              dispatch(AuthLogout());
+              return navigation.replace('Auth');
+            } else if (!res.data.data.pin) {
+              setLoading(false);
+              return navigation.replace('Auth', {
+                screen: 'RegisterPin',
+                params: {token, navigate: 'Dashboard'},
+              });
+            }
+            return _loadHistory();
           });
-        }
-        return _loadHistory();
       }
       setLoading(false);
       if (res) {

@@ -7,10 +7,13 @@ import {PersistGate} from 'redux-persist/integration/react';
 import 'react-native-gesture-handler';
 
 function App() {
-  React.useEffect(() => SplashScreen.hide(), []);
+  const _loadPersist = () => setTimeout(() => SplashScreen.hide(), 1500);
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
+      <PersistGate
+        loading={null}
+        onBeforeLift={_loadPersist}
+        persistor={persistor}>
         <Routes />
       </PersistGate>
     </Provider>

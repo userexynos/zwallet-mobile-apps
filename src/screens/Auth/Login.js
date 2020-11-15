@@ -18,6 +18,7 @@ import Button from '../../components/Buttons/Button';
 import InputBorderedBottom from '../../components/Inputs/InputBorderedBottom';
 import Loading from '../../components/Modals/Loading';
 import {AuthLogin} from '../../redux/actions/auth';
+import messaging from '@react-native-firebase/messaging';
 
 const {width} = Dimensions.get('window');
 
@@ -36,7 +37,6 @@ const Login = ({navigation}) => {
   const {token} = useSelector((state) => state.Auth);
 
   React.useEffect(() => {
-    setLoading(true);
     const keyboardShow = Keyboard.addListener('keyboardDidShow', () =>
       setKey(true),
     );
@@ -44,15 +44,10 @@ const Login = ({navigation}) => {
       setKey(false);
     });
 
-    const timeout = setTimeout(() => {
-      if (token) {
-        navigation.replace('Dashboard');
-        console.log(token);
-      }
-      setLoading(false);
-    }, 1000);
+    if (token) {
+      navigation.replace('Dashboard');
+    }
     return () => {
-      clearTimeout(timeout);
       keyboardShow.remove();
       keyboardDismiss.remove();
     };
@@ -91,22 +86,28 @@ const Login = ({navigation}) => {
   const _handleLogin = () => {
     setLoading(true);
     setError('');
-    const data = {email, password};
+    messaging()
+      .getToken()
+      .then((device) => {
+        const data = {email, password, device};
 
-    const _handleResponse = (res, err) => {
-      setLoading(false);
-      if (!err) {
-        return navigation.replace('Dashboard');
-      }
+        const _handleResponse = (res, err) => {
+          console.log(res);
+          setLoading(false);
+          if (!err) {
+            return navigation.replace('Dashboard');
+          }
 
-      if (res) {
-        return setError(res.data.message);
-      }
-      return setError('Connection Error');
-    };
+          if (res) {
+            return setError(res.data.message);
+          }
+          return setError('Connection Error');
+        };
 
-    dispatch(AuthLogin(data, _handleResponse));
+        dispatch(AuthLogin(data, _handleResponse));
+      });
   };
+
   return (
     <>
       <Loading show={loading} />

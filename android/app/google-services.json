@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "771024121392",
+    "firebase_url": "https://indo-socialmedia.firebaseio.com",
+    "project_id": "indo-socialmedia",
+    "storage_bucket": "indo-socialmedia.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:771024121392:android:c31178dd13194d4bfa47f5",
+        "android_client_info": {
+          "package_name": "com.zwallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "771024121392-qf13heboq68n62m85t3bal7phdleu96v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLJJfVzgqb4jIGdq2UGdKuRUBTaheZ8nE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "771024121392-qf13heboq68n62m85t3bal7phdleu96v.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
