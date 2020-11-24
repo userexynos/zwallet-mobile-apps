@@ -1,6 +1,7 @@
 import {
   ADDFINDUSERDATA,
   ADDHISTORYDATA,
+  SETBALANCE,
   SETFINDUSERDATA,
   SETHISTORYDATA,
   SETHISTORYIDDATA,
@@ -24,6 +25,8 @@ const usersReducer = (state = initState, action) => {
   switch (type) {
     case SETUSERDATA:
       return {...state, userdata: payload};
+    case SETBALANCE:
+      return {...state, userdata: {...state.userdata, balance: payload}};
     case SETHISTORYDATA:
       const {income, history, expense} = payload;
       return {...state, histories: history, income, expense};

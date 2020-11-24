@@ -59,9 +59,14 @@ const ProfilePassword = ({navigation}) => {
   }, [AnimatedContent, isKey]);
 
   const _changePassword = () => {
-    if (newPassword !== verify) {
+    if (!password) {
+      return setError('Password cannot be null');
+    } else if (!newPassword) {
+      return setError('New password cannot be null');
+    } else if (newPassword !== verify) {
       return setError("Verify Password isn't match");
     }
+
     setLoading(true);
     const _callbackChangePass = (res, err) => {
       setLoading(false);

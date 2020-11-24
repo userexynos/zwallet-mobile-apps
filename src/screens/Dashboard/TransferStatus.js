@@ -43,10 +43,11 @@ const TransferStatus = ({navigation, route}) => {
   const [loading, setLoading] = React.useState(false);
   const dispatch = useDispatch();
   const {token} = useSelector((state) => state.Auth);
-  const {history} = useSelector((state) => state.Users);
+  const {history, userdata} = useSelector((state) => state.Users);
 
   React.useEffect(() => {
     _loadHistory();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -61,6 +62,8 @@ const TransferStatus = ({navigation, route}) => {
         }
         return ToastAndroid.show('Connection Refused', ToastAndroid.SHORT);
       }
+
+      // socket.emit('transfer', res.data.data.id_receiver);
     };
     dispatch(HistoryByID({id: route.params.id, token}, _callbackHistory));
   };
@@ -92,12 +95,13 @@ const TransferStatus = ({navigation, route}) => {
                 title="Amount"
                 subtitle={`Rp${currency(history.amount)}`}
               />
-
-              <CardCustom
-                style={{borderRadius: 10, marginVertical: 6}}
-                title="Balance Left"
-                subtitle={`Rp${currency(history.balance)}`}
-              />
+              {userdata.id === history.id_user ? (
+                <CardCustom
+                  style={{borderRadius: 10, marginVertical: 6}}
+                  title="Balance Left"
+                  subtitle={`Rp${currency(history.balance)}`}
+                />
+              ) : null}
 
               <CardCustom
                 style={{borderRadius: 10, marginVertical: 6}}
@@ -111,18 +115,39 @@ const TransferStatus = ({navigation, route}) => {
                 subtitle={history.note}
               />
 
-              <Text style={styles.transferTitle}>Transfer to</Text>
-              <CardReceiver
-                src={history.photo_receiver}
-                style={{borderRadius: 10, marginVertical: 6}}
-                rippleColor={colors.transparent}
-                name={history.name_receiver}
-                phone={
-                  history.phone_receiver
-                    ? `+62 ${history.phone_receiver}`
-                    : "The phone isn't set"
-                }
-              />
+              {userdata.id === history.id_user ? (
+                <>
+                  <Text style={styles.transferTitle}>Transfer to</Text>
+
+                  <CardReceiver
+                    src={history.photo_receiver}
+                    style={{borderRadius: 10, marginVertical: 6}}
+                    rippleColor={colors.transparent}
+                    name={history.name_receiver}
+                    phone={
+                      history.phone_receiver
+                        ? `+62 ${history.phone_receiver}`
+                        : "The phone isn't set"
+                    }
+                  />
+                </>
+              ) : (
+                <>
+                  <Text style={styles.transferTitle}>Transfer from</Text>
+
+                  <CardReceiver
+                    src={history.photo}
+                    style={{borderRadius: 10, marginVertical: 6}}
+                    rippleColor={colors.transparent}
+                    name={history.name}
+                    phone={
+                      history.phone
+                        ? `+62 ${history.phone}`
+                        : "The phone isn't set"
+                    }
+                  />
+                </>
+              )}
 
               <Button
                 style={{marginTop: 20}}

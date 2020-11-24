@@ -18,7 +18,8 @@ import InputPinBorder from '../../components/Inputs/InputPinBorder';
 import {useDispatch, useSelector} from 'react-redux';
 import {BalanceTransfer} from '../../redux/actions/users';
 import Loading from '../../components/Modals/Loading';
-import {patcher, SETUSERDATA} from '../../redux/constants';
+// import {patcher, SETUSERDATA} from '../../redux/constants';
+import {io} from 'socket.io-client';
 
 const {width} = Dimensions.get('screen');
 
@@ -31,6 +32,7 @@ const TransferPinInput = ({navigation, route}) => {
   const {token} = useSelector((state) => state.Auth);
   const {userdata} = useSelector((state) => state.Users);
   const dispatch = useDispatch();
+  const socket = io('http://54.242.174.249:4444');
 
   React.useEffect(() => {
     const keyboardShow = Keyboard.addListener('keyboardDidShow', () => {
@@ -67,6 +69,9 @@ const TransferPinInput = ({navigation, route}) => {
 
     const _callbackTransfer = (res, err) => {
       setLoading(false);
+      if (!pin) {
+        return setError('Pin cannot be null');
+      }
       if (err) {
         if (res) {
           return setError(res.data.message);
@@ -74,14 +79,13 @@ const TransferPinInput = ({navigation, route}) => {
         return setError('Connection Error');
       }
 
-      dispatch(
-        patcher(SETUSERDATA, {
-          ...userdata,
-          // eslint-disable-next-line radix
-          balance: userdata.balance - parseInt(route.params.detail.amount),
-        }),
-      );
-      navigation.replace('TransferStatus', {id: res.data.data.id});
+      socket.emit('userBalance', userdata.id);
+      socket.emit('userBalance', route.params.user.id);
+
+      navigation.replace('TransferStatus', {
+        id: res.data.data.id,
+        transfer: true,
+      });
     };
 
     dispatch(BalanceTransfer(data, _callbackTransfer));

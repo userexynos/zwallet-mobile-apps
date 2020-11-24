@@ -10,21 +10,23 @@ const options = {
   },
 };
 
+const optionsCamera = {
+  mediaType: 'photo',
+  quality: 0,
+  saveToPhotos: false,
+};
+
 const imagePicker = (callback) => {
   return ImagePicker.launchImageLibrary(options, (response) => {
-    // console.log('Response = ', response);
-
-    // if (response.didCancel) {
-    //   console.log('User cancelled image picker');
-    // } else if (response.error) {
-    //   console.log('ImagePicker Error: ', response.error);
-    // } else if (response.customButton) {
-    //   console.log('User tapped custom button: ', response.customButton);
-    // } else {
-
-    // }
     callback(response);
   });
 };
 
-export {imagePicker};
+const imageCapture = (callback) => {
+  return ImagePicker.launchCamera(optionsCamera, (response) => {
+    console.log(response);
+    callback(response);
+  });
+};
+
+export {imagePicker, imageCapture};

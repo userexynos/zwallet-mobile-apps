@@ -56,12 +56,15 @@ const ProfilePhone = ({navigation}) => {
   }, [AnimatedContent, isKey]);
 
   const _submitPhone = () => {
+    if (!phone) {
+      return setError('Phone Number cannot be null');
+    }
+
     setLoading(true);
     const _callbackAddPhone = (res, err) => {
       setLoading(false);
       if (err) {
         if (res) {
-          console.log(res);
           return setError(res.data.message);
         }
 

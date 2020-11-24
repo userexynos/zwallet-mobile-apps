@@ -86,6 +86,14 @@ const Register = ({navigation}) => {
   };
 
   const _handleRegister = () => {
+    if (!name) {
+      return setError('Name cannot be null');
+    } else if (!email) {
+      return setError('Email cannot be null');
+    } else if (!password) {
+      return setError('Password cannot be null');
+    }
+
     setLoading(true);
     setError('');
     const data = {name, email, password};

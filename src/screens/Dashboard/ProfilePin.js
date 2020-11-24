@@ -54,6 +54,10 @@ const ProfilePin = ({navigation}) => {
   }, [AnimatedContent, isKey]);
 
   const _handleChangePin = () => {
+    if (!pin) {
+      return setError('Pin cannot be null');
+    }
+
     setLoading(true);
     setError('');
     const data = {pin, token};

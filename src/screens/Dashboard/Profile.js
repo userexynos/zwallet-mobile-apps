@@ -9,6 +9,8 @@ import {
   Text,
   Image,
   ToastAndroid,
+  Modal,
+  TouchableOpacity,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import {colors, fonts} from '../../helpers/constants';
@@ -18,38 +20,40 @@ import {
   RectButton,
   TouchableWithoutFeedback,
 } from 'react-native-gesture-handler';
-import {imagePicker} from '../../helpers/gallery';
+import {imageCapture, imagePicker} from '../../helpers/gallery';
 import {AuthLogout} from '../../redux/actions/auth';
 import {ChangePhoto} from '../../redux/actions/users';
 import {patcher, SETUSERDATA} from '../../redux/constants';
 import Loading from '../../components/Modals/Loading';
+import Button from '../../components/Buttons/Button';
 
 const Profile = ({navigation}) => {
   const [loading, setLoading] = React.useState(false);
   const {token} = useSelector((state) => state.Auth);
   const {userdata} = useSelector((state) => state.Users);
   const dispatch = useDispatch();
+  const [choice, setChoice] = React.useState(false);
 
-  const _handleUploadImage = () => {
-    imagePicker((response) => {
-      if (response.didCancel) {
-        // console.log('User cancelled image picker');
-      } else if (response.error) {
-        // console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        // console.log('User tapped custom button: ', response.customButton);
-      } else {
-        const formData = new FormData();
-        formData.append('photo', {
-          uri: response.uri,
-          type: response.type,
-          name: response.fileName,
-        });
-
-        const data = {photo: formData, token};
-        _uploadImage(data);
-      }
-    });
+  const _handleUploadImage = (response) => {
+    setChoice(false);
+    // imagePicker((response) => {
+    if (response.didCancel) {
+      // console.log('User cancelled image picker');
+    } else if (response.error) {
+      // console.log('ImagePicker Error: ', response.error);
+    } else if (response.customButton) {
+      // console.log('User tapped custom button: ', response.customButton);
+    } else {
+      const formData = new FormData();
+      formData.append('photo', {
+        uri: response.uri,
+        type: response.type,
+        name: response.fileName,
+      });
+      const data = {photo: formData, token};
+      _uploadImage(data);
+    }
+    // });
   };
 
   const _uploadImage = (data) => {
@@ -100,7 +104,7 @@ const Profile = ({navigation}) => {
               />
 
               <TouchableWithoutFeedback
-                onPress={_handleUploadImage}
+                onPress={() => setChoice(!choice)}
                 style={styles.profileEdit}>
                 <Icons name="edit-2" size={14} color={colors.grey} />
                 <Text style={styles.profileEditText}>Edit</Text>
@@ -146,6 +150,64 @@ const Profile = ({navigation}) => {
             </View>
           </ScrollView>
         </View>
+
+        <Modal
+          hardwareAccelerated
+          visible={choice}
+          onRequestClose={() => setChoice(false)}
+          transparent={true}
+          animationType="fade">
+          <View
+            style={{
+              flex: 1,
+              justifyContent: 'center',
+              alignItems: 'center',
+              backgroundColor: colors.rippleDark,
+            }}>
+            <View
+              style={{
+                backgroundColor: colors.white,
+                width: '60%',
+                borderRadius: 14,
+              }}>
+              <TouchableOpacity
+                onPress={() => imageCapture(_handleUploadImage)}
+                style={[styles.button, {backgroundColor: colors.white}]}>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    {color: colors.dark, fontSize: 16},
+                  ]}>
+                  Take a photo
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => imagePicker(_handleUploadImage)}
+                style={[styles.button, {backgroundColor: colors.white}]}>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    {color: colors.dark, fontSize: 16},
+                  ]}>
+                  Open gallery
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => setChoice(false)}
+                style={[styles.button, {backgroundColor: colors.error}]}>
+                <Text
+                  style={[
+                    styles.buttonText,
+                    {color: colors.white, fontSize: 16},
+                  ]}>
+                  Cancel
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
       </SafeAreaView>
     </>
   );
@@ -154,6 +216,14 @@ const Profile = ({navigation}) => {
 export default Profile;
 
 const styles = StyleSheet.create({
+  button: {
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontFamily: fonts.bold,
+  },
   container: {
     backgroundColor: colors.vanilla,
     paddingTop: StatusBar.currentHeight,

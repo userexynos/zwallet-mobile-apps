@@ -146,6 +146,8 @@ const BalanceTransfer = (data, callback) => () => {
 
 const HistoryByID = (data, callback) => (dispatch) => {
   const {id, token} = data;
+  dispatch(patcher(SETHISTORYIDDATA, {}));
+
   axios
     .get(`/users/history/${id}`, {
       headers: {

@@ -84,6 +84,12 @@ const Login = ({navigation}) => {
   };
 
   const _handleLogin = () => {
+    if (!email) {
+      return setError('Email cannot be null');
+    } else if (!password) {
+      return setError('Password cannot be null');
+    }
+
     setLoading(true);
     setError('');
     messaging()
@@ -92,7 +98,6 @@ const Login = ({navigation}) => {
         const data = {email, password, device};
 
         const _handleResponse = (res, err) => {
-          console.log(res);
           setLoading(false);
           if (!err) {
             return navigation.replace('Dashboard');

@@ -19,20 +19,60 @@ import {Histories, UserLoad} from '../../redux/actions/users';
 import {currency} from '../../helpers/number';
 import {AuthLogout} from '../../redux/actions/auth';
 import messaging from '@react-native-firebase/messaging';
+import {io} from 'socket.io-client';
+import {patcher, SETBALANCE, SETUSERDATA} from '../../redux/constants';
 
 const Main = ({navigation}) => {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState('');
+  const [balance, setBalance] = React.useState('');
   const dispatch = useDispatch();
   const {token} = useSelector((state) => state.Auth);
   const {userdata, histories} = useSelector((state) => state.Users);
+  let socket = io('http://54.242.174.249:4444');
 
   React.useEffect(() => {
     setLoading(true);
     _loadUser();
 
+    messaging()
+      .getInitialNotification()
+      .then((remoteMessage) => {
+        if (remoteMessage) {
+          setLoading(false);
+          _historyNavigate(remoteMessage.data.id);
+        }
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  React.useEffect(() => {
+    socket.on('getBalance', (value) => {
+      setBalance(value);
+      dispatch(patcher(SETBALANCE, value));
+      _loadHistory();
+    });
+
+    return () => {
+      if (!userdata?.id) {
+        socket.off('balance');
+      }
+    };
+  }, [socket, userdata, dispatch]);
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      if (userdata?.id) {
+        socket.emit('userConnect', userdata.id);
+      }
+    }, 30000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, []);
+
+  const _historyNavigate = (id) => navigation.navigate('TransferStatus', {id});
 
   const _loadUser = () => {
     const _callbackHandler = (res, err) => {
@@ -50,6 +90,9 @@ const Main = ({navigation}) => {
                 params: {token, navigate: 'Dashboard'},
               });
             }
+
+            socket.emit('userConnect', res.data.data.id);
+            setBalance(res.data.data.balance);
             return _loadHistory();
           });
       }
@@ -107,6 +150,7 @@ const Main = ({navigation}) => {
           .slice(0, 5)
           .map((item, index) => (
             <CardHistory
+              onPress={() => _historyNavigate(item.id)}
               key={index}
               name={item.name}
               type={item.type}
@@ -138,9 +182,7 @@ const Main = ({navigation}) => {
             <View style={styles.balanceContainer}>
               <View style={styles.balanceView}>
                 <Text style={styles.balanceTitle}>Balance</Text>
-                <Text style={styles.balanceAmount}>
-                  Rp{currency(userdata?.balance)}
-                </Text>
+                <Text style={styles.balanceAmount}>Rp{currency(balance)}</Text>
                 <Text style={styles.balancePhone}>
                   {userdata?.phone
                     ? `+62 ${userdata?.phone}`

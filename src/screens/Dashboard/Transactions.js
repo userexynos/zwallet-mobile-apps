@@ -31,6 +31,8 @@ const Transactions = ({navigation}) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const _historyNavigate = (id) => navigation.navigate('TransferStatus', {id});
+
   const _loadHistory = () => {
     setLoading(true);
     const _callbackHistory = (res, err) => {
@@ -73,6 +75,7 @@ const Transactions = ({navigation}) => {
           .slice(0, 5)
           .map((item, index) => (
             <CardHistory
+              onPress={() => _historyNavigate(item.id)}
               key={index}
               name={item.name}
               type={item.type}

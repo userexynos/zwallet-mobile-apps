@@ -56,6 +56,10 @@ const Login = ({navigation, route}) => {
   });
 
   const _handleCreatePin = () => {
+    if (!pin) {
+      return setError('Pin cannot be null');
+    }
+
     setLoading(true);
     setError('');
     const data = {pin, token: route.params.token};
