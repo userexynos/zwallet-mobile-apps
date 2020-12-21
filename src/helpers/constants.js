@@ -22,7 +22,7 @@ const fonts = {
 };
 
 const axios = axiosCreate.create({
-  baseURL: 'http://54.242.174.249:4444/api/v1',
+  baseURL: 'http://52.90.229.55:3001/api/v1',
   // baseURL: 'http://192.168.100.27:4444/api/v1',
 });
 

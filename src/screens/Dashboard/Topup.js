@@ -9,10 +9,13 @@ import {
   Image,
   Text,
   ToastAndroid,
+  Modal,
 } from 'react-native';
+import {WebView} from 'react-native-webview';
 import {useDispatch, useSelector} from 'react-redux';
 import {colors, fonts} from '../../helpers/constants';
 import Toolbar from '../../components/Toolbars/Toolbar';
+import WebviewToolbar from '../../components/Toolbars/WebviewToolbar';
 import {RectButton} from 'react-native-gesture-handler';
 import {GuideTopup} from '../../redux/actions/users';
 import Loading from '../../components/Modals/Loading';
@@ -20,6 +23,7 @@ import Loading from '../../components/Modals/Loading';
 const Topup = ({navigation}) => {
   const [error, setError] = React.useState('');
   const [loading, setLoading] = React.useState(false);
+  const [webview, setWebview] = React.useState(false);
 
   const dispatch = useDispatch();
   const {token} = useSelector((state) => state.Auth);
@@ -91,9 +95,26 @@ const Topup = ({navigation}) => {
     </>
   );
 
+  const RenderWebview = () => (
+    <Modal animationType="fade" hardwareAccelerated={true} visible={webview}>
+      <>
+        <WebviewToolbar
+          toolbarColor={colors.white}
+          backgroundColor={colors.white}
+          title="Top up"
+        />
+        <WebView
+          style={{height: '100%', width: '100%'}}
+          source={{uri: 'https://google.com/'}}
+        />
+      </>
+    </Modal>
+  );
+
   return (
     <>
       <Loading show={loading} />
+      <RenderWebview />
       <StatusBar
         translucent
         backgroundColor={colors.transparent}
@@ -115,7 +136,7 @@ const Topup = ({navigation}) => {
               <View style={{zIndex: 0}}>
                 <RectButton
                   rippleColor={colors.rippleDark}
-                  onPress={() => console.log(1)}
+                  onPress={() => setWebview(true)}
                   style={styles.topupCardContainer}>
                   <Image
                     source={require('../../assets/images/plus.png')}
@@ -199,5 +220,20 @@ const styles = StyleSheet.create({
   topupCardPhoto: {
     height: 56,
     width: 56,
+  },
+  modalContainer: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: colors.rippleDark,
+  },
+  modalContainer: {
+    width: '100%',
+    height: '10%',
+    backgroundColor: colors.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20,
   },
 });
